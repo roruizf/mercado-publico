@@ -1,0 +1,10 @@
+/notebooks
+/venv
+/old
+*.env
+/__pycache__/
+common.py 
+*.txt
+*.csv
+/tender/searches
+/tender/tender_list
