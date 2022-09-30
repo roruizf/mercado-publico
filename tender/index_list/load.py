@@ -10,6 +10,8 @@ def load():
     data_df = _read_data_files()
     data_df = _set_columns_types(data_df)
     conn = _connect_to_database()
+    table_name = 'tender_index_list'
+    _create_table(conn, table_name)
     stored_data_df = _get_stored_index_list(conn)
     data_to_insert_df, data_to_upsert_df = _compare_stored_and_new_data(
         data_df, stored_data_df)
@@ -86,6 +88,33 @@ def _connect_to_database():
     return conn
 
 
+def _create_table(conn, table_name):
+    # columns: codigo_externo, nombre, codigo_estado, estado, fecha_cierre, fecha_publicacion
+
+    query = f"""
+            CREATE TABLE IF NOT EXISTS public."{table_name}"
+            (
+                id SERIAL NOT NULL,
+                codigo_externo character varying(20) NOT NULL UNIQUE,
+                nombre character varying(255),
+                codigo_estado integer, 
+                estado character varying(12),
+                fecha_cierre timestamp without time zone,
+                fecha_publicacion date,                                                    
+                CONSTRAINT "{table_name}_pkey" PRIMARY KEY (codigo_externo)
+            )
+            TABLESPACE pg_default;
+
+            ALTER TABLE IF EXISTS public."{table_name}"
+                OWNER to postgres;
+            """
+
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+
 def _get_stored_index_list(conn):
     sql_query = """
                 SELECT *
@@ -152,34 +181,8 @@ def _load_data_into_database(conn, df, table_name):
         fecha_cierre = EXCLUDED.fecha_cierre, fecha_publicacion = EXCLUDED.fecha_publicacion;
         """ % (table_name, row['codigo_externo'], row['nombre'], row['codigo_estado'], row['estado'],
                row['fecha_cierre'].to_pydatetime(), row['fecha_publicacion'].to_pydatetime())
-        print(query)
+        # print(query)
         single_insert(conn, query)
-
-# def _insert_values(conn, df, table):
-
-#     if not df.empty:
-
-#         tuples = [tuple(x) for x in df.to_numpy()]
-
-#         cols = ','.join(list(df.columns))
-#         # SQL query to execute
-#         query = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
-#         # query = "INSERT INTO %s(%s) VALUES %%s ON CONFLICT (codigo_externo) DO UPDATE" % (
-#         #     table, cols)
-#         print(query)
-#         cursor = conn.cursor()
-#         try:
-#             extras.execute_values(cursor, query, tuples)
-#             conn.commit()
-#         except (Exception, psycopg2.DatabaseError) as error:
-#             print("Error: %s" % error)
-#             conn.rollback()
-#             cursor.close()
-#             return 1
-#         print("the dataframe is inserted")
-#         cursor.close()
-#     else:
-#         print('Nothing to INSERT')
 
 
 if __name__ == '__main__':

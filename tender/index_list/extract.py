@@ -38,9 +38,9 @@ def download_tender_list_for_a_giving_period(initial_date, end_date):
 
 def download_tender_list_for_a_giving_date(date):
     ticket = 'F8537A18-6766-4DEF-9E59-426B4FEE2844'
-    url = 'http://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?fecha=' + \
+    url = 'https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?fecha=' + \
         date + '&ticket=' + ticket
-    # url = 'http://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?fecha=' + date + '&CodigoOrganismo=' + '6938' + '&ticket=' + ticket
+    # url = 'https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?fecha=' + date + '&CodigoOrganismo=' + '6938' + '&ticket=' + ticket
 
     # Downloading data for a given day -> making sure the data is downladed (status_code == 200)
     status = True

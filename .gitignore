@@ -8,3 +8,5 @@ common.py
 *.csv
 /tender/searches
 /tender/tender_list
+/tender/index_list/__pycache__
+/tender/database_credentials.env
